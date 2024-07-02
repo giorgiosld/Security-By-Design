@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Asynchronous channels c and d are simulated using explicit queues
+
+const int N = 5; // capacity of the simulated queues
+
+chan s2qc; // used by the sender to send on queue c
+chan r2qc; // used by the receiver to receive from queue c
+bool sentValueOnC; // global shared variable used to exchange the data through the channels s2qc and r2qc when a message is sent or received
+
+chan s2qd; // used by the sender to send on queue d
+chan r2qd; // used by the receiver to receive from queue d
+bool sentValueOnD; // global shared variable used to exchange the data through the channels s2qd and r2qd when a message is sent or received
+
+// Synchronous channels e and f are implemented as *three* UPPAAL channels to avoid the sending of values over 
+// channels that is not native in UPPPAAL
+
+chan timerOn; // used by the sender to activate the timer
+chan timeOut; // used by the timer to communicate the time-out
+chan timerOff; // used by the sender to stop the timer before the time-out</declaration>
+	<template>
+		<name x="5" y="5">Timer</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id0" x="-34" y="-51">
+			<name x="-17" y="-59">On</name>
+		</location>
+		<location id="id1" x="-355" y="-51">
+			<name x="-399" y="-59">Off</name>
+		</location>
+		<init ref="id1"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-221" y="-229">timerOff?</label>
+			<nail x="-195" y="-195"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-169" y="-9">timeOut!</label>
+			<nail x="-187" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-272" y="-76">timerOn?</label>
+		</transition>
+	</template>
+	<template>
+		<name>Sender</name>
+		<declaration>bool currentBit = 0;
+bool receivedBit;</declaration>
+		<location id="id2" x="153" y="-144">
+			<name x="143" y="-178">Wait</name>
+		</location>
+		<location id="id3" x="-59" y="-144">
+			<name x="-69" y="-178">ActivateTimer</name>
+		</location>
+		<location id="id4" x="-357" y="-136">
+			<name x="-399" y="-170">TryToSend</name>
+		</location>
+		<location id="id5" x="-59" y="25">
+			<name x="-93" y="-8">TestBit</name>
+		</location>
+		<location id="id6" x="-518" y="-136">
+			<name x="-528" y="-170">NotSending</name>
+		</location>
+		<init ref="id6"/>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-263" y="0">receivedBit == currentBit</label>
+			<label kind="synchronisation" x="-407" y="8">timerOff!</label>
+			<label kind="assignment" x="-476" y="-85">currentBit = !currentBit</label>
+			<nail x="-425" y="25"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id4"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id2"/>
+			<label kind="guard" x="170" y="-51">receivedBit != currentBit</label>
+			<nail x="153" y="25"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="17" y="-85">r2qd?</label>
+			<label kind="assignment" x="-68" y="-51">receivedBit = sentValueOnD</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-221" y="-399">timeOut?</label>
+			<nail x="-187" y="-374"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="8" y="-136">timerOn!</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-221" y="-110">s2qc!</label>
+			<label kind="assignment" x="-289" y="-59">sentValueOnC = currentBit</label>
+			<nail x="-195" y="-68"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="comments" x="-221" y="-229">lost_message</label>
+			<nail x="-246" y="-212"/>
+		</transition>
+	</template>
+	<template>
+		<name>Receiver</name>
+		<declaration>bool currentBit = 0;
+
+bool receivedBit; // local variable for receiving from the queue
+</declaration>
+		<location id="id7" x="-238" y="51">
+			<name x="-212" y="42">SendAck</name>
+		</location>
+		<location id="id8" x="-93" y="-119">
+			<name x="-103" y="-153">Check</name>
+		</location>
+		<location id="id9" x="-391" y="-119">
+			<name x="-401" y="-153">Wait</name>
+		</location>
+		<location id="id10" x="-510" y="0">
+		</location>
+		<init ref="id9"/>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id9"/>
+			<label kind="assignment" x="-612" y="-85">currentBit = !currentBit</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="-340" y="0">s2qd!</label>
+			<label kind="assignment" x="-501" y="51">sentValueOnC = currentBit</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-153" y="-51">receivedBit == currentBit</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-289" y="-306">receivedBit != currentBit</label>
+			<nail x="-246" y="-280"/>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-297" y="-144">r2qc?</label>
+			<label kind="assignment" x="-323" y="-102">receivedBit = sentValueOnC</label>
+		</transition>
+	</template>
+	<template>
+		<name>QueueC</name>
+		<declaration>bool queue[N+1];
+
+// Queue data structure using an array with N+1 positions:
+// [head, first after head, ..., last, free position, free position, last position (must remain always free) ]
+
+int[0,N] ffp = 0; // pointer to the first free position (ffp) of the queue, if pointer == 0, the queue is empty, if the pointer == N, the queue is full
+
+bool isFull() {
+  //  the queue is full when the pointer is equal to N 
+  return ffp == N;
+
+}
+
+bool isEmpty() {
+  // the queue is empty when the pointer is equal to 0
+  return ffp == 0;
+
+}
+
+// assumes that the queue is not empty
+bool dequeue() {
+  // return the first element (position 0) and shift all subsequent elements to the left
+  bool tmp = queue[0]; // the element to return
+  int i;
+  for (i = 0; i &lt; ffp - 1; i++)
+    queue[i] = queue[i+1];
+  ffp--;
+  return tmp;
+}
+
+// assume that the queue is not full
+void enqueue(bool v) {
+  // put the new element in the ffp position
+  queue[ffp] = v;
+  ffp++;
+}</declaration>
+		<location id="id11" x="-467" y="-255">
+		</location>
+		<init ref="id11"/>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-458" y="-348">not isEmpty()</label>
+			<label kind="synchronisation" x="-271" y="-272">r2qc!</label>
+			<label kind="assignment" x="-373" y="-153">sentValueOnC = dequeue()</label>
+			<nail x="-288" y="-374"/>
+			<nail x="-297" y="-161"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id11"/>
+			<label kind="guard" x="-594" y="-306">not isFull()</label>
+			<label kind="synchronisation" x="-773" y="-229">s2qc?</label>
+			<label kind="assignment" x="-781" y="-127">enqueue(sentValueOnC)</label>
+			<nail x="-723" y="-310"/>
+			<nail x="-723" y="-132"/>
+		</transition>
+	</template>
+	<template>
+		<name>QueueD</name>
+		<declaration>bool queue[N+1];
+
+// Queue data structure using an array with N+1 positions:
+// [head, first after head, ..., last, free position, free position, last position (must remain always free) ]
+
+int[0,N] ffp; // pointer to the first free position (ffp) of the queue, if pointer == 0, the queue is empty, if the pointer == N, the queue is full
+
+bool isFull() {
+  //  the queue is full when the pointer is equal to N 
+  return ffp == N;
+
+}
+
+bool isEmpty() {
+  // the queue is empty when the pointer is equal to 0
+  return ffp == 0;
+
+}
+
+// assumes that the queue is not empty
+bool dequeue() {
+  // return the first element (position 0) and shift all subsequent elements to the left
+  bool tmp = queue[0]; // the element to return
+  int i;
+  for (i = 0; i &lt; ffp - 1; i++)
+    queue[i] = queue[i+1];
+  ffp--;
+  return tmp;
+}
+
+// assume that the queue is not full
+void enqueue(bool v) {
+  // put the new element in the ffp position
+  queue[ffp] = v;
+  ffp++;
+}</declaration>
+		<location id="id12" x="0" y="0">
+		</location>
+		<init ref="id12"/>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="guard" x="-93" y="-93">not isFull()</label>
+			<label kind="synchronisation" x="-170" y="-34">s2qd?</label>
+			<label kind="assignment" x="-221" y="85">enqueue(sentValueOnD)</label>
+			<nail x="-119" y="-93"/>
+			<nail x="-119" y="85"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id12"/>
+			<label kind="guard" x="136" y="-102">not isEmpty()</label>
+			<label kind="synchronisation" x="136" y="-34">r2qd!</label>
+			<label kind="assignment" x="76" y="76">sentValueOnD = dequeue()</label>
+			<nail x="119" y="-102"/>
+			<nail x="119" y="59"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+
+// List one or more processes to be composed into a system.
+system Timer,Sender,Receiver,QueueC,QueueD;
+    </system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>Sender.TryToSend --&gt; Sender.NotSending</formula>
+			<comment>Every time the sender wants to send a message, that massage will be sent sooner or later</comment>
+		</query>
+	</queries>
+</nta>

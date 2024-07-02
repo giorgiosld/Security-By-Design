@@ -1,0 +1,40 @@
+never p1 {    /* !([] (<> ((Sender@trytosend)))) */
+T0_init:
+	do
+	:: (! (((Sender@trytosend)))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! (((Sender@trytosend)))) -> goto accept_S4
+	od;
+}
+never p2 {    /* !([] (<> ((Sender@ackreceived)))) */
+T0_init:
+	do
+	:: (! (((Sender@ackreceived)))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! (((Sender@ackreceived)))) -> goto accept_S4
+	od;
+}
+never p3 {    /* !([] ((! ((Sender@wait))) || ((Timer@timeroff)))) */
+T0_init:
+	do
+	:: atomic { (! (((! ((Sender@wait))) || ((Timer@timeroff))))) -> assert(!(! (((! ((Sender@wait))) || ((Timer@timeroff)))))) }
+	:: (1) -> goto T0_init
+	od;
+accept_all:
+	skip
+}
+never p4 {    /* !([] ((! ((Sender@wait))) || ((Timer@timeron)))) */
+T0_init:
+	do
+	:: atomic { (! (((! ((Sender@wait))) || ((Timer@timeron))))) -> assert(!(! (((! ((Sender@wait))) || ((Timer@timeron)))))) }
+	:: (1) -> goto T0_init
+	od;
+accept_all:
+	skip
+}

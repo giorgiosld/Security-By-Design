@@ -1,0 +1,25 @@
+States
+
+Transitions
+
+Statements from -d file
+process=0, source=19, target=4, id=0, line=18.1
+process=0, source=4, target=6, id=1, line=21.1
+process=0, source=4, target=6, id=2, line=21.c!altbit
+process=0, source=6, target=17, id=5, line=24.e!timer_on
+process=0, source=17, target=4, id=6, line=27.f?tout
+process=0, source=17, target=15, id=8, line=27.d?x
+process=0, source=15, target=17, id=9, line=29.x!=altbit
+process=0, source=15, target=13, id=11, line=29.x==altbit
+process=0, source=13, target=14, id=12, line=31.e!timer_off
+process=0, source=14, target=19, id=13, line=32.altbit = !altbit
+process=1, source=8, target=6, id=22, line=42.c?y
+process=1, source=6, target=8, id=23, line=44.y!=altbit
+process=1, source=6, target=4, id=24, line=44.y==altbit
+process=1, source=4, target=5, id=25, line=45.d!altbit
+process=1, source=5, target=8, id=26, line=46.altbit = !altbit
+process=2, source=6, target=4, id=33, line=54.e?timer_on
+process=2, source=4, target=6, id=34, line=56.e?timer_off
+process=2, source=4, target=6, id=35, line=56.f!tout
+
+Trail

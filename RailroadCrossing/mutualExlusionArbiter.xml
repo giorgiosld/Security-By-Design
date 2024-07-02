@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+chan lock;
+chan unlock;
+</declaration>
+	<template>
+		<name x="5" y="5">Arbiter</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id0" x="8" y="-161">
+			<name x="25" y="-170">locked</name>
+		</location>
+		<location id="id1" x="-195" y="-170">
+			<name x="-280" y="-178">unlocked</name>
+		</location>
+		<init ref="id1"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-110" y="-85">unlock?</label>
+			<nail x="-93" y="-93"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-119" y="-255">lock?</label>
+			<nail x="-93" y="-229"/>
+		</transition>
+	</template>
+	<template>
+		<name>P1</name>
+		<location id="id2" x="-76" y="34">
+			<name x="-136" y="25">critical</name>
+		</location>
+		<location id="id3" x="-76" y="-85">
+			<name x="-127" y="-102">wait</name>
+		</location>
+		<location id="id4" x="-76" y="-204">
+			<name x="-161" y="-238">nonCritical</name>
+		</location>
+		<init ref="id4"/>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="25" y="-51">unlock!</label>
+			<nail x="42" y="-93"/>
+			<nail x="42" y="-93"/>
+			<nail x="42" y="-93"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-136" y="-51">lock!</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+		</transition>
+	</template>
+	<template>
+		<name>P2</name>
+		<location id="id5" x="-68" y="17">
+			<name x="-127" y="8">critical</name>
+		</location>
+		<location id="id6" x="-76" y="-102">
+			<name x="-118" y="-170">wait</name>
+		</location>
+		<location id="id7" x="-76" y="-221">
+			<name x="-86" y="-255">nonCritical</name>
+		</location>
+		<init ref="id7"/>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="34" y="-102">unlock!</label>
+			<nail x="34" y="-110"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-68" y="-68">lock!</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id6"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+// List one or more processes to be composed into a system.
+system Arbiter, P1, P2;
+    </system>
+	<queries>
+		<query>
+			<formula>E&lt;&gt; (P1.critical &amp;&amp; P2.critical)
+			</formula>
+			<comment>
+			</comment>
+		</query>
+		<query>
+			<formula>A[] not deadlock
+			</formula>
+			<comment>
+			</comment>
+		</query>
+	</queries>
+</nta>

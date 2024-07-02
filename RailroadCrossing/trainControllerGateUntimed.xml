@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+// To represent action in uppal we use chan and the direction of action
+chan approach;
+chan exiting;
+chan raise;
+chan lower;
+</declaration>
+	<template>
+		<name x="5" y="5">Train</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id0" x="-187" y="-85">
+			<name x="-197" y="-119">far</name>
+		</location>
+		<location id="id1" x="0" y="-85">
+			<name x="-10" y="-119">near</name>
+		</location>
+		<location id="id2" x="-93" y="17">
+			<name x="-127" y="0">in</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id3">
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-204" y="-42">exiting!</label>
+		</transition>
+		<transition id="id4">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="comments" x="-34" y="-34">enter</label>
+		</transition>
+		<transition id="id5">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-144" y="-102">approach!</label>
+		</transition>
+	</template>
+	<template>
+		<name>Controller</name>
+		<location id="id6" x="-68" y="-102">
+			<name x="-78" y="-136">s0</name>
+		</location>
+		<location id="id7" x="-168" y="-59">
+			<name x="-178" y="-93">s3</name>
+		</location>
+		<location id="id8" x="17" y="-51">
+			<name x="7" y="-85">s1</name>
+		</location>
+		<location id="id9" x="-76" y="25">
+			<name x="-86" y="-9">s2</name>
+		</location>
+		<init ref="id6"/>
+		<transition id="id10">
+			<source ref="id7"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-144" y="-102">raise!</label>
+		</transition>
+		<transition id="id11">
+			<source ref="id9"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-170" y="-8">exiting?</label>
+		</transition>
+		<transition id="id12">
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-25" y="-17">lower!</label>
+		</transition>
+		<transition id="id13">
+			<source ref="id6"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-34" y="-102">approach?</label>
+		</transition>
+	</template>
+	<template>
+		<name>Gate</name>
+		<location id="id14" x="-110" y="-102">
+			<name x="-120" y="-136">up</name>
+		</location>
+		<location id="id15" x="-110" y="-17">
+			<name x="-136" y="8">down</name>
+		</location>
+		<init ref="id14"/>
+		<transition id="id16">
+			<source ref="id15"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-204" y="-76">raise?</label>
+			<nail x="-170" y="-59"/>
+		</transition>
+		<transition id="id17">
+			<source ref="id14"/>
+			<target ref="id15"/>
+			<label kind="synchronisation" x="-59" y="-51">lower?</label>
+			<nail x="-51" y="-68"/>
+		</transition>
+	</template>
+	<system>
+// List one or more processes to be composed into a system.
+system Train, Controller, Gate;
+    </system>
+	<queries>
+		<option key="--diagnostic" value="1"/>
+		<query>
+			<formula>A[] (Train.in imply Gate.down)</formula>
+			<comment/>
+			<result outcome="failure" type="quality" timestamp="2024-05-05 14:58:48 +0200">
+				<option key="--diagnostic" value="1"/>
+			</result>
+		</query>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment/>
+			<result outcome="success" type="quality" timestamp="2024-05-05 14:58:20 +0200">
+			</result>
+		</query>
+	</queries>
+</nta>

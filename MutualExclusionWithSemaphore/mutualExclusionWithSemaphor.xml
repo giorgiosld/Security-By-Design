@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+int[0,1] y = 1;</declaration>
+	<template>
+		<name x="5" y="5">P</name>
+		<parameter>int[1,2] i</parameter>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id0" x="-229" y="-144">
+			<name x="-255" y="-178">nonCrit</name>
+		</location>
+		<location id="id1" x="-228" y="-51">
+			<name x="-212" y="-59">wait</name>
+		</location>
+		<location id="id2" x="-229" y="68">
+			<name x="-212" y="59">crit</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id3">
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="assignment" x="-365" y="-93">y = y +1</label>
+			<nail x="-323" y="-51"/>
+		</transition>
+		<transition id="id4">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-228" y="-26">y &gt; 0</label>
+			<label kind="assignment" x="-228" y="8">y = y - 1</label>
+		</transition>
+		<transition id="id5">
+			<source ref="id0"/>
+			<target ref="id1"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+//P1 = P(1);
+//P2 = P(2);
+// List one or more processes to be composed into a system.
+system P;
+// system P1, P2;
+    </system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment/>
+			<result outcome="success" type="quality" timestamp="2024-05-05 10:46:29 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>A[] (P(1).crit imply not P(2).crit) and (P(2).crit imply not P(1).crit) </formula>
+			<comment/>
+			<result outcome="success" type="quality" timestamp="2024-05-05 10:46:38 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>P(1).wait --&gt; P(1).crit</formula>
+			<comment/>
+			<result outcome="failure" type="quality" timestamp="2024-05-05 10:46:40 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>P(2).wait --&gt; P(2).crit</formula>
+			<comment/>
+			<result outcome="failure" type="quality" timestamp="2024-05-05 10:46:44 +0200">
+			</result>
+		</query>
+	</queries>
+</nta>
