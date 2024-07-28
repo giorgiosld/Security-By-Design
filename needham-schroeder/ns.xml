@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+chan start;
+
+// Channels for communication
+chan network;
+
+// Global shared variables for data exchange
+int content1;
+int content2;
+
+// Nonce and status variables
+const int nonceA = 10;
+const int nonceB = 11; 
+const int nonceI = 12;
+bool statusA = false;
+bool statusB = false;
+
+bool knows_nonceA = false;
+bool knows_nonceB = false;
+
+// Key variables and identity
+const int keyA = 20;
+const int keyB = 21;
+const int keyI = 22;
+const int agentA = 31;
+const int agentB = 32;
+const int agentI = 33;
+
+int partnerA;
+int partnerB;
+int pkey;
+
+// state variable to see if intercept is running in this moment
+bool intercept = false;
+// state variable to wait that the last message has been sent before start new run
+bool pround = false;</declaration>
+	<template>
+		<name>Alice</name>
+		<declaration>int pkPartner;
+int noncePartner;</declaration>
+		<location id="id0" x="-765" y="-93">
+			<name x="-884" y="-102">CreateMsg1</name>
+		</location>
+		<location id="id1" x="-493" y="-408">
+			<name x="-503" y="-442">SendMsg1</name>
+		</location>
+		<location id="id2" x="44" y="-408">
+			<name x="8" y="-450">WaitMsg2</name>
+		</location>
+		<location id="id3" x="195" y="-93">
+			<name x="161" y="-68">CreateMsg3</name>
+		</location>
+		<location id="id4" x="-340" y="-93">
+			<name x="-374" y="-68">SendMsg3</name>
+		</location>
+		<location id="id5" x="195" y="-408">
+			<name x="185" y="-442">CheckMsg22</name>
+		</location>
+		<location id="id6" x="-603" y="-93">
+			<name x="-654" y="-136">WaitAnotherRun</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id7">
+			<source ref="id5"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-59" y="-357">pkey == keyA &amp;&amp;
+content1 == nonceA &amp;&amp;
+partnerA == agentI</label>
+			<label kind="assignment" x="-8" y="-238">noncePartner = content2,
+intercept = true</label>
+			<nail x="59" y="-255"/>
+		</transition>
+		<transition id="id8">
+			<source ref="id6"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-739" y="-85">pround == true</label>
+			<label kind="assignment" x="-748" y="-119">intercept = false</label>
+		</transition>
+		<transition id="id9">
+			<source ref="id4"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-442" y="-119">network!</label>
+			<label kind="assignment" x="-569" y="-85">statusA = true</label>
+		</transition>
+		<transition id="id10">
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="assignment" x="-127" y="-161">pkey = pkPartner,
+content1 = noncePartner,
+content2 = 0</label>
+		</transition>
+		<transition id="id11">
+			<source ref="id5"/>
+			<target ref="id3"/>
+			<label kind="guard" x="289" y="-374">pkey == keyA &amp;&amp;
+content1 == nonceA &amp;&amp;
+partnerA == agentB</label>
+			<label kind="assignment" x="238" y="-212">noncePartner = content2</label>
+			<nail x="323" y="-255"/>
+		</transition>
+		<transition id="id12">
+			<source ref="id5"/>
+			<target ref="id1"/>
+			<label kind="guard" x="34" y="-637">pkey != keyA</label>
+			<nail x="110" y="-586"/>
+		</transition>
+		<transition id="id13">
+			<source ref="id2"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="85" y="-425">network?</label>
+		</transition>
+		<transition id="id14">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-272" y="-433">network!</label>
+		</transition>
+		<transition id="id15">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="assignment" x="-739" y="-374">partnerA = agentB,
+pkey = keyB,
+content1 = agentA,
+content2 = nonceA,
+pkPartner = keyB,
+pround = false</label>
+		</transition>
+		<transition id="id16">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-943" y="-229">knows_nonceB != true</label>
+			<label kind="assignment" x="-722" y="-552">partnerA = agentI,
+pkey = keyI,
+content1 = agentA,
+content2 = nonceA,
+pkPartner = keyI,
+intercept = true,
+pround = false</label>
+			<nail x="-765" y="-408"/>
+		</transition>
+	</template>
+	<template>
+		<name>Bob</name>
+		<declaration>int noncePartner;</declaration>
+		<location id="id17" x="-433" y="68">
+			<name x="-484" y="85">WaitMsg1</name>
+		</location>
+		<location id="id18" x="-433" y="-221">
+			<name x="-501" y="-280">CheckMsg1</name>
+		</location>
+		<location id="id19" x="17" y="-221">
+			<name x="-25" y="-263">CreateMsg2</name>
+		</location>
+		<location id="id20" x="221" y="-93">
+			<name x="246" y="-127">SendMsg2</name>
+		</location>
+		<location id="id21" x="17" y="68">
+			<name x="-17" y="85">WaitMsg3</name>
+		</location>
+		<location id="id22" x="-212" y="68">
+			<name x="-246" y="85">CheckMsg3</name>
+			<committed/>
+		</location>
+		<init ref="id17"/>
+		<transition id="id23">
+			<source ref="id22"/>
+			<target ref="id21"/>
+			<label kind="guard" x="-153" y="272">pkey != keyB</label>
+			<nail x="-102" y="255"/>
+		</transition>
+		<transition id="id24">
+			<source ref="id18"/>
+			<target ref="id17"/>
+			<label kind="guard" x="-603" y="-246">pkey != keyB</label>
+			<label kind="synchronisation" x="-722" y="-93">network!</label>
+			<nail x="-620" y="-221"/>
+			<nail x="-620" y="68"/>
+		</transition>
+		<transition id="id25">
+			<source ref="id22"/>
+			<target ref="id17"/>
+			<label kind="guard" x="-374" y="25">pkey == keyB &amp;&amp;
+nonceB == content1</label>
+			<label kind="assignment" x="-415" y="68">statusB = true,
+pround = true</label>
+		</transition>
+		<transition id="id26">
+			<source ref="id21"/>
+			<target ref="id22"/>
+			<label kind="guard" x="-170" y="76">intercept == false</label>
+			<label kind="synchronisation" x="-136" y="42">network?</label>
+		</transition>
+		<transition id="id27">
+			<source ref="id20"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="238" y="-8">network!</label>
+			<nail x="221" y="68"/>
+		</transition>
+		<transition id="id28">
+			<source ref="id19"/>
+			<target ref="id20"/>
+			<label kind="assignment" x="144" y="-306">partnerB = agentA,
+pkey = keyA,
+content1 = noncePartner,
+content2 = nonceB</label>
+			<nail x="221" y="-221"/>
+		</transition>
+		<transition id="id29">
+			<source ref="id18"/>
+			<target ref="id19"/>
+			<label kind="guard" x="-323" y="-246">pkey == keyB</label>
+			<label kind="assignment" x="-212" y="-221">noncePartner = content2,
+intercept = false</label>
+		</transition>
+		<transition id="id30">
+			<source ref="id17"/>
+			<target ref="id18"/>
+			<label kind="guard" x="-433" y="-55">intercept == false</label>
+			<label kind="synchronisation" x="-501" y="-76">network?</label>
+			<nail x="-433" y="-110"/>
+		</transition>
+	</template>
+	<template>
+		<name>Intruder</name>
+		<declaration>int intercepted1;
+int intercepted2;
+int interceptedk;
+
+int noncePartner;
+</declaration>
+		<location id="id31" x="-289" y="-51">
+			<name x="-399" y="-42">InterceptMsg</name>
+		</location>
+		<location id="id32" x="-289" y="-272">
+			<name x="-374" y="-331">CheckIfDecrypt</name>
+		</location>
+		<location id="id33" x="297" y="-51">
+			<name x="314" y="-59">DetectTypeMsg</name>
+		</location>
+		<location id="id34" x="153" y="-272">
+			<name x="93" y="-306">KnowledgeKey</name>
+		</location>
+		<location id="id35" x="-93" y="-51">
+			<name x="-103" y="-85">AssembleMsg1</name>
+		</location>
+		<location id="id36" x="297" y="289">
+			<name x="246" y="297">AssembleMsg3</name>
+		</location>
+		<location id="id37" x="-93" y="170">
+			<name x="-221" y="170">SendMSg</name>
+		</location>
+		<init ref="id31"/>
+		<transition id="id38">
+			<source ref="id36"/>
+			<target ref="id37"/>
+			<label kind="assignment" x="8" y="289">pkey = keyB,
+intercept = false</label>
+			<nail x="-93" y="289"/>
+		</transition>
+		<transition id="id39">
+			<source ref="id35"/>
+			<target ref="id37"/>
+			<label kind="assignment" x="-93" y="59">pkey = keyB,
+intercept = false</label>
+		</transition>
+		<transition id="id40">
+			<source ref="id33"/>
+			<target ref="id36"/>
+			<label kind="guard" x="306" y="119">content2 == 0</label>
+		</transition>
+		<transition id="id41">
+			<source ref="id33"/>
+			<target ref="id35"/>
+			<label kind="guard" x="34" y="-76">content1 == agentA</label>
+		</transition>
+		<transition id="id42">
+			<source ref="id32"/>
+			<target ref="id31"/>
+			<label kind="guard" x="-688" y="-170">pkey != keyI</label>
+			<label kind="synchronisation" x="-568" y="-289">network!</label>
+			<nail x="-586" y="-272"/>
+			<nail x="-586" y="-51"/>
+		</transition>
+		<transition id="id43">
+			<source ref="id32"/>
+			<target ref="id34"/>
+			<label kind="guard" x="-255" y="-272">pkey == keyI</label>
+			<label kind="assignment" x="-136" y="-340">interceptedk = pkey,
+intercepted1 = content1,
+intercepted2 = content2</label>
+		</transition>
+		<transition id="id44">
+			<source ref="id37"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="-365" y="59">network!</label>
+			<nail x="-289" y="170"/>
+		</transition>
+		<transition id="id45">
+			<source ref="id34"/>
+			<target ref="id33"/>
+			<label kind="guard" x="-25" y="-212">intercepted1 == nonceB ||
+intercepted2 == nonceB</label>
+			<label kind="assignment" x="93" y="-110">knows_nonceB = true</label>
+		</transition>
+		<transition id="id46">
+			<source ref="id34"/>
+			<target ref="id33"/>
+			<label kind="guard" x="195" y="-314">intercepted1 == nonceA ||
+intercepted2 == nonceA</label>
+			<label kind="assignment" x="306" y="-229">knows_nonceA = true</label>
+			<nail x="297" y="-272"/>
+		</transition>
+		<transition id="id47">
+			<source ref="id31"/>
+			<target ref="id32"/>
+			<label kind="guard" x="-289" y="-119">intercept == true &amp;&amp;
+knows_nonceB != true</label>
+			<label kind="synchronisation" x="-289" y="-170">network?</label>
+		</transition>
+	</template>
+	<system>// List one or more processes to be composed into a system.
+system Alice, Bob, Intruder;
+</system>
+	<queries>
+		<query>
+			<formula>A[]not deadlock</formula>
+			<comment>Veridy if there aren't deadlock</comment>
+			<result outcome="success" type="quality" timestamp="2024-06-18 19:49:43 +0200">
+			</result>
+		</query>
+		<query>
+			<formula>A[] ((statusA == 1 &amp;&amp; statusB == 1 &amp;&amp; partnerA == 32 &amp;&amp; partnerB == 31) imply (knows_nonceA == 0 || knows_nonceB == 0))
+</formula>
+			<comment>In the simulator 1 is set when the state become true, 32 is the number that define agentB and 31 is the number that define agentA.
+Similarly for the nonce if their are not known by the Intruder their values are 0.
+This property is violated because Intruder is able to know either nonces so the mitm attack is a valid to perform in this system.</comment>
+			<result outcome="failure" type="quality" timestamp="2024-06-18 20:15:14 +0200">
+			</result>
+		</query>
+	</queries>
+</nta>
