@@ -1,4 +1,3 @@
-```markdown
 # Security by Design - Master Degree LM-18 (2023/2024)
 
 This repository contains the lab assignments and project work for the Security by Design course taken at the University of Camerino. The course is part of the Master Degree LM-18 program for the academic year 2023/2024.
@@ -26,4 +25,4 @@ This directory contains the final project report and related files for modeling 
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
-```
+
